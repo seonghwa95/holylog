@@ -28,7 +28,7 @@ public class PostController {
 
     // @RequestMapping(method = RequestMethod.GET, path = "/posts") -> 예전 방식
     @PostMapping("/posts")
-    public Map<String, String> get(@RequestBody @Valid PostCreate params, BindingResult result) {
+    public Map<String, String> get(@RequestBody @Valid PostCreate params) {
         log.info("params = {}", params.toString());
 
         /**
@@ -70,18 +70,19 @@ public class PostController {
          * 2. 응답값에 HashMap -> 응답 클래스를 만들어주는게 좋다.
          * 3. 여러개의 에러처리 힘들다.
          * 4. 세 번이상의 반복적인 작업은 피해야한다.
+         *      > 코드 && 개발에 관한 모든 것
          */
-        if (result.hasErrors()) {
-            List<FieldError> fieldErrors = result.getFieldErrors();     // 에러 리스트
-            FieldError firstFieldError = fieldErrors.get(0);            // 리스트의 0번째 인덱스
-            String fieldName = firstFieldError.getField();              // title
-            String errorMessage = firstFieldError.getDefaultMessage();  // 에러 메세지 => must not be blank
-            // 에러 메세지 변경방법 NotBlank 어노테이션에 message 속성 넣어서 변경
-
-            Map<String, String> error = new HashMap<>();
-            error.put(fieldName, errorMessage);
-            return error;
-        }       
+//        if (result.hasErrors()) {
+//            List<FieldError> fieldErrors = result.getFieldErrors();     // 에러 리스트
+//            FieldError firstFieldError = fieldErrors.get(0);            // 리스트의 0번째 인덱스
+//            String fieldName = firstFieldError.getField();              // title
+//            String errorMessage = firstFieldError.getDefaultMessage();  // 에러 메세지 => must not be blank
+//            // 에러 메세지 변경방법 NotBlank 어노테이션에 message 속성 넣어서 변경
+//
+//            Map<String, String> error = new HashMap<>();
+//            error.put(fieldName, errorMessage);
+//            return error;
+//        }
 
         return Map.of();
     }
