@@ -1,6 +1,8 @@
 package com.holyheem.controller;
 
 import com.holyheem.request.PostCreate;
+import com.holyheem.service.PostService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -13,11 +15,14 @@ import java.util.Map;
 
 @Slf4j
 @RestController // 데이터 기반으로 API응답 방식으로 진행할 예정 (JSON)
+@RequiredArgsConstructor
 public class PostController {
     // SSR -> JSP, thymeleaf, mustache, freemarker
     // SPA ->
     //      vue -> vue + SSR = nuxt.js    ( 이걸로 진행할 예정 )
     //      react -> react + SSR = next.js
+
+    private final PostService postService;
 
 
     // Http Method
@@ -28,9 +33,7 @@ public class PostController {
 
     // @RequestMapping(method = RequestMethod.GET, path = "/posts") -> 예전 방식
     @PostMapping("/posts")
-    public Map<String, String> get(@RequestBody @Valid PostCreate params) {
-        log.info("params = {}", params.toString());
-
+    public Map<String, String> post(@RequestBody @Valid PostCreate request) {
         /**
          * 아래와 같은 방식의 데이터 검증은 매우 별로다..
          * 1. 빡세다.
@@ -83,6 +86,12 @@ public class PostController {
 //            error.put(fieldName, errorMessage);
 //            return error;
 //        }
+
+        // db.save(params)          DB에 저장을 할 예정
+        // repository.save(params) --> 이렇게 해왔지만
+        // 가능한 서비스 단계를 하나 만들어서 거기에서 레포지토리를 호출하는 방식을 추천하신다.
+
+        postService.write(request);
 
         return Map.of();
     }
