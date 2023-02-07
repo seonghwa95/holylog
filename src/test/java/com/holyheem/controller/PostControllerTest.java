@@ -1,7 +1,9 @@
 package com.holyheem.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.holyheem.domain.Post;
 import com.holyheem.repository.PostRepository;
+import com.holyheem.request.PostCreate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class PostControllerTest {
 
     @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -36,14 +40,26 @@ class PostControllerTest {
     @Test
     @DisplayName("/posts 요청시 Hello World를 출력한다.")
     void 테스트() throws Exception {
-        // 글 제목
+        // given
+        // PostCreate request = new PostCreate("제목입니다.", "내용입니다.");
+        PostCreate request = PostCreate.builder()   // 위의 생성자의 순서가 변경되는 경우 방지
+                .title("제목입니다.")
+                .content("내용입니다.")
+                .build();
+
+        // json 프로세싱 해주는 라이브러리 ( request의 string들을 json 형태로 가공 )
+        // 실무에서 굉장히 많이 쓰이니 반드시 기억해두자
+        String json = objectMapper.writeValueAsString(request);
+
+        // 눈으로 확인...
+        System.out.println(json);
 
         // 글 내용
 
         // expects
         mockMvc.perform(MockMvcRequestBuilders.post("/posts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":\"제목입니다.\", \"content\":\"내용입니다.\"}")
+                        .content(json)
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("{}"))
@@ -54,14 +70,20 @@ class PostControllerTest {
     @Test
     @DisplayName("/posts 요청시 title 값은 필수다.")
     void 테스트2() throws Exception {
-        // 글 제목
+        // given
+        // PostCreate request = new PostCreate("제목입니다.", "내용입니다.");
+        PostCreate request = PostCreate.builder()   // 위의 생성자의 순서가 변경되는 경우 방지
+                .content("내용입니다.")
+                .build();
 
-        // 글 내용
+        // json 프로세싱 해주는 라이브러리 ( request의 string들을 json 형태로 가공 )
+        // 실무에서 굉장히 많이 쓰이니 반드시 기억해두자
+        String json = objectMapper.writeValueAsString(request);
 
         // expects
         mockMvc.perform(MockMvcRequestBuilders.post("/posts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":null, \"content\":\"내용입니다.\"}")
+                        .content(json)
                 )
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("400"))
@@ -73,10 +95,21 @@ class PostControllerTest {
     @Test
     @DisplayName("/posts 요청시 DB에 값이 저장된다.")
     void 테스트3() throws Exception {
+        // given
+        // PostCreate request = new PostCreate("제목입니다.", "내용입니다.");
+        PostCreate request = PostCreate.builder()   // 위의 생성자의 순서가 변경되는 경우 방지
+                .title("제목입니다.")
+                .content("내용입니다.")
+                .build();
+
+        // json 프로세싱 해주는 라이브러리 ( request의 string들을 json 형태로 가공 )
+        // 실무에서 굉장히 많이 쓰이니 반드시 기억해두자
+        String json = objectMapper.writeValueAsString(request);
+
         // when
         mockMvc.perform(MockMvcRequestBuilders.post("/posts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":\"제목입니다.\", \"content\":\"내용입니다.\"}")
+                        .content(json)
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
